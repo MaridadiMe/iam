@@ -1,16 +1,29 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserResponseDto } from 'src/modules/user/dtos/user-response.dto';
 import { UserService } from 'src/modules/user/services/user.service';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private userService: UserService) {
+  constructor(
+    private userService: UserService,
+    private configService: ConfigService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.APPLICATION_SECRET_KEY,
+      secretOrKey: fs.readFileSync(
+        path.join(
+          __dirname,
+          `../../../../${configService.get('PUBLIC_KEY_FILE_PATH')}`,
+        ),
+        'utf8',
+      ),
+      algorithms: [configService.get('KEY_SIGNING_ALGORITHM')],
     });
   }
 
