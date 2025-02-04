@@ -19,14 +19,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           privateKey: fs.readFileSync(
             path.join(
               __dirname,
-              `../../${configService.get('PRIVATE_KEY_FILE_PATH')}`,
+              `../../../${configService.get('PRIVATE_KEY_FILE_PATH')}`,
             ),
             'utf8',
           ),
           publicKey: fs.readFileSync(
             path.join(
               __dirname,
-              `../../${configService.get('PUBLIC_KEY_FILE_PATH')}`,
+              `../../../${configService.get('PUBLIC_KEY_FILE_PATH')}`,
             ),
             'utf8',
           ),

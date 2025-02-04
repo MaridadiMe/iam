@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: fs.readFileSync(
         path.join(
           __dirname,
-          `../../../../${configService.get('PUBLIC_KEY_FILE_PATH')}`,
+          `../../../../../${configService.get('PUBLIC_KEY_FILE_PATH')}`,
         ),
         'utf8',
       ),
