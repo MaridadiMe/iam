@@ -4,9 +4,9 @@ import {
   Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserResponseDto } from 'src/modules/user/dtos/user-response.dto';
+import { UserResponseDto } from 'src/modules/users/dtos/user-response.dto';
 import { RequestPasswordChangeDto } from '../dtos/request-password-change.dto';
-import { UserService } from 'src/modules/user/services/user.service';
+import { UserService } from 'src/modules/users/services/user.service';
 
 @Injectable()
 export class AuthService {

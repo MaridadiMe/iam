@@ -1,5 +1,12 @@
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { Column, Entity } from 'typeorm';
+import { Role } from 'src/modules/roles/entities/role.entity';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
@@ -11,6 +18,9 @@ export class User extends BaseEntity {
 
   @Column()
   phone: string;
+
+  @Column({ unique: true })
+  userName: string;
 
   @Column({ unique: true })
   email: string;
@@ -32,4 +42,11 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true })
   lastLogin: Date;
+
+  @DeleteDateColumn({ nullable: true })
+  deletedAt: Date;
+
+  @ManyToOne(() => Role, { nullable: true })
+  @JoinColumn({ name: 'roleId' })
+  role: Role;
 }

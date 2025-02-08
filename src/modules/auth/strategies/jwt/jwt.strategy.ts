@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { UserResponseDto } from 'src/modules/user/dtos/user-response.dto';
-import { UserService } from 'src/modules/user/services/user.service';
+import { UserResponseDto } from 'src/modules/users/dtos/user-response.dto';
+import { UserService } from 'src/modules/users/services/user.service';
 import * as fs from 'fs';
 import * as path from 'path';
 

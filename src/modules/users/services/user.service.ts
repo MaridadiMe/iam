@@ -62,11 +62,13 @@ export class UserService extends BaseService<User> {
     try {
       const salt = await bcrypt.genSalt();
       const hash = await bcrypt.hash(dto.password, salt);
+      const userName = `${dto.firstName[0]}${dto.lastName}`.toUpperCase();
 
       const user = this.userRepository.create({
         ...dto,
         password: hash,
         createdBy: 'SYSTEM',
+        userName,
       });
       const savedUser = await this.userRepository.save(user);
       return new UserResponseDto(savedUser);
