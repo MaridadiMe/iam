@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Post,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
@@ -11,6 +13,7 @@ import { LocalAuthGuard } from '../guards/local-auth-guard';
 import { ApiBody } from '@nestjs/swagger';
 import { BaseResponseDto } from 'src/common/dto/base-response.dto';
 import { RequestPasswordChangeDto } from '../dtos/request-password-change.dto';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -39,6 +42,13 @@ export class AuthController {
   @Post('pasword/change-request')
   @HttpCode(200)
   async requestPasswordChange(@Body() dto: RequestPasswordChangeDto) {
-    return await this.authService.requestPasswordChange(dto);
+    const data = await this.authService.requestPasswordChange(dto);
+    return new BaseResponseDto(data);
+  }
+
+  @Get('public-key')
+  getPublicKey(@Res() res: Response): Response {
+    const key = this.authService.getPublicKey();
+    return res.setHeader('Content-Type', 'text/plain').send(key);
   }
 }

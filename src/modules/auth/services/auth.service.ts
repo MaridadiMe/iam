@@ -7,6 +7,10 @@ import { JwtService } from '@nestjs/jwt';
 import { UserResponseDto } from 'src/modules/users/dtos/user-response.dto';
 import { RequestPasswordChangeDto } from '../dtos/request-password-change.dto';
 import { UserService } from 'src/modules/users/services/user.service';
+import { User } from 'src/modules/users/entities/user.entity';
+import * as fs from 'fs';
+import * as path from 'path';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +18,7 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
+    private readonly configService: ConfigService,
   ) {}
 
   signIn(user: UserResponseDto): { accessToken: string } {
@@ -32,8 +37,7 @@ export class AuthService {
   }
 
   async requestPasswordChange(payload: RequestPasswordChangeDto) {
-    // check if the user actually exists
-    let user;
+    let user: User;
     try {
       user = await this.userService.findUserByEmail(payload.email);
     } catch (error) {
@@ -56,5 +60,21 @@ export class AuthService {
     this.logger.log(`Password change requested for user with ID: ${user.id}`);
 
     return resp;
+  }
+
+  getPublicKey() {
+    try {
+      const key = fs.readFileSync(
+        path.join(
+          __dirname,
+          `../../../../${this.configService.get('PUBLIC_KEY_FILE_PATH')}`,
+        ),
+        'utf8',
+      );
+      return key;
+    } catch (error) {
+      this.logger.error(`Error While Reading Key: ${error}`);
+      throw new InternalServerErrorException(`Key Not Found`);
+    }
   }
 }
