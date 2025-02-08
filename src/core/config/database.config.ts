@@ -10,7 +10,7 @@ export const databaseConnectionOptions = (
   database: configService.get<string>('DB_NAME'),
   username: configService.get<string>('DB_USER'),
   password: configService.get<string>('DB_PASSWORD'),
-  logging: true,
+  logging: configService.get<string>('DB_LOGGING') === 'true',
   synchronize: configService.get<string>('DB_SYNCHRONIZE') === 'true',
   entities: [__dirname + '/../../modules/**/*.entity{.ts,.js}'],
 });

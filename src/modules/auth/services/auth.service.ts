@@ -23,6 +23,7 @@ export class AuthService {
       phone: user.phone,
       firstName: user.firstName,
       lastName: user.lastName,
+      permissions: user.permissions,
     };
 
     return {

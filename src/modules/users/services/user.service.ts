@@ -80,9 +80,12 @@ export class UserService extends BaseService<User> {
 
   async validateUser(email: string, pass: string): Promise<UserResponseDto> {
     try {
-      const user = await this.userRepository.findOneBy({
-        email: email,
-        isActive: true,
+      const user = await this.userRepository.findOne({
+        where: {
+          email: email,
+          isActive: true,
+        },
+        relations: ['role', 'role.permissions'],
       });
       if (!user) {
         return null;
@@ -96,6 +99,14 @@ export class UserService extends BaseService<User> {
       if (!isMatch) {
         this.logger.error(`Incorrect Password for User with ID: ${user.id}`);
         return null;
+      }
+
+      if (user.role) {
+        const permissions =
+          user.role?.permissions?.flatMap(
+            (permission) => permission.permission.name,
+          ) ?? [];
+        user.permissions = permissions;
       }
       return new UserResponseDto(user);
     } catch (error) {

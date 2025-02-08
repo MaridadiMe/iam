@@ -7,6 +7,7 @@ export class UserResponseDto {
   firstName: string;
   lastName: string;
   userName: string;
+  permissions: string[];
 
   constructor(user: User) {
     this.id = user.id;
@@ -15,5 +16,6 @@ export class UserResponseDto {
     this.phone = user.phone;
     this.email = user.email;
     this.userName = user.userName;
+    this.permissions = user.permissions;
   }
 }

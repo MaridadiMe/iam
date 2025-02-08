@@ -49,4 +49,6 @@ export class User extends BaseEntity {
   @ManyToOne(() => Role, { nullable: true })
   @JoinColumn({ name: 'roleId' })
   role: Role;
+
+  permissions: string[];
 }
