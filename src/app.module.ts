@@ -7,6 +7,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { APP_GUARD, Reflector } from '@nestjs/core';
 import { PermissionsGuard } from './modules/auth/guards/permissions.guard';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth-guard';
+import { RolesModule } from './modules/roles/roles.module';
+import { PermissionsModule } from './modules/permissions/permissions.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { JwtAuthGuard } from './modules/auth/guards/jwt-auth-guard';
     }),
     UserModule,
     AuthModule,
+    RolesModule,
+    PermissionsModule,
   ],
   providers: [
     // Reflector,
