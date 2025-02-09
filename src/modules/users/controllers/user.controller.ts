@@ -16,6 +16,8 @@ import { UserResponseDto } from '../dtos/user-response.dto';
 import { BaseResponseDto } from 'src/common/dto/base-response.dto';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth-guard';
+import { Permissions } from 'src/modules/auth/decorators/permissions.decorator';
+import { PublicRoute } from 'src/modules/auth/decorators/public.decorator';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -27,7 +29,7 @@ export class UserController extends BaseController<User> {
 
   @Get()
   @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
+  @Permissions('VIEW_USERS')
   async findAllUsers(): Promise<BaseResponseDto<UserResponseDto[]>> {
     const users = await this.userService.findAllUsers();
     return new BaseResponseDto(users);
@@ -35,7 +37,7 @@ export class UserController extends BaseController<User> {
 
   @Get(':id')
   @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   async findUserById(
     @Param('id') id: string,
   ): Promise<BaseResponseDto<UserResponseDto>> {

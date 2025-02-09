@@ -28,19 +28,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    const user: UserResponseDto = await this.userService.findUserById(
-      payload.id,
-    );
-    if (user) {
-      return user;
-    }
+    //Consider proper implementation here if we really need fresh user data.
+
+    // const user: UserResponseDto = await this.userService.findUserById(
+    //   payload.id,
+    // );
+    // if (user) {
+    //   console.log('this is the user', user);
+    //   return user;
+    // }
+
+    const { sub, ...rest } = payload;
+
     return {
-      id: payload.sub,
-      phone: payload.phone,
-      email: payload.email,
-      firstName: payload.lastName,
-      lastName: payload.lastName,
-      permissions: payload.permissions,
+      id: sub,
+      ...rest,
     };
   }
 }
