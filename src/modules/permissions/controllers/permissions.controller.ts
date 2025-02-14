@@ -34,7 +34,7 @@ export class PermissionsController {
 
   @Get()
   @HttpCode(200)
-  @Permissions('VIEW_PERMISSIONS')
+  // @Permissions('VIEW_PERMISSIONS')
   async getPermissions(): Promise<BaseResponseDto<Permissions[]>> {
     const permissions = await this.service.findAll();
     return new BaseResponseDto(permissions);

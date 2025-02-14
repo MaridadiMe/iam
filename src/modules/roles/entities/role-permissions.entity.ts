@@ -5,12 +5,12 @@ import { BaseEntity } from 'src/common/entities/base.entity';
 
 @Entity('role_permissions')
 export class RolePermission extends BaseEntity {
-  @ManyToOne(() => Role, (role) => role.permissions, { eager: true })
+  @ManyToOne(() => Role, (role) => role.permissions, { eager: false })
   @JoinColumn({ name: 'roleId' })
   role: Role;
 
   @ManyToOne(() => Permission, (permission) => permission.roles, {
-    eager: true,
+    eager: false,
   })
   @JoinColumn({ name: 'permissionId' })
   permission: Permission;

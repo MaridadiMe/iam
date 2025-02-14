@@ -37,7 +37,7 @@ export class UserController extends BaseController<User> {
 
   @Get(':id')
   @HttpCode(200)
-  // @UseGuards(JwtAuthGuard)
+  @Permissions('VIEW_USERS')
   async findUserById(
     @Param('id') id: string,
   ): Promise<BaseResponseDto<UserResponseDto>> {
@@ -47,6 +47,7 @@ export class UserController extends BaseController<User> {
 
   @Post()
   @HttpCode(201)
+  @PublicRoute()
   async createUser(
     @Body() dto: CreateUserDto,
   ): Promise<BaseResponseDto<UserResponseDto>> {
