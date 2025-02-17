@@ -5,7 +5,9 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { BaseController } from 'src/common/controllers/base.controller';
@@ -18,6 +20,7 @@ import { CreateUserDto } from '../dtos/create-user.dto';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth-guard';
 import { Permissions } from 'src/modules/auth/decorators/permissions.decorator';
 import { PublicRoute } from 'src/modules/auth/decorators/public.decorator';
+import { AuthenticatedUser } from 'src/modules/auth/decorators/authenticated-user.decorator';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -29,7 +32,7 @@ export class UserController extends BaseController<User> {
 
   @Get()
   @HttpCode(200)
-  @Permissions('VIEW_USERS')
+  // @Permissions('VIEW_USERS')
   async findAllUsers(): Promise<BaseResponseDto<UserResponseDto[]>> {
     const users = await this.userService.findAllUsers();
     return new BaseResponseDto(users);
@@ -37,12 +40,24 @@ export class UserController extends BaseController<User> {
 
   @Get(':id')
   @HttpCode(200)
-  @Permissions('VIEW_USERS')
+  // @Permissions('VIEW_USERS')
   async findUserById(
     @Param('id') id: string,
   ): Promise<BaseResponseDto<UserResponseDto>> {
     const user = await this.userService.findUserById(id);
     return new BaseResponseDto(user);
+  }
+
+  @Patch(':id/assign-role')
+  @HttpCode(200)
+  // @Permissions('VIEW_USERS')
+  async assignRoleToUser(
+    @Param('id') id: string,
+    @Query('roleId') roleId: string,
+    @AuthenticatedUser() user: User,
+  ): Promise<BaseResponseDto<UserResponseDto>> {
+    const result = await this.userService.assignRoleToUser(id, roleId, user);
+    return new BaseResponseDto(result);
   }
 
   @Post()

@@ -11,11 +11,16 @@ import * as bcrypt from 'bcrypt';
 import { UserRepository } from '../repositories/user.repository';
 import { UserResponseDto } from '../dtos/user-response.dto';
 import { CreateUserDto } from '../dtos/create-user.dto';
+import { Role } from 'src/modules/roles/entities/role.entity';
+import { RolesRepository } from 'src/modules/roles/repositories/roles.repository';
 
 @Injectable()
 export class UserService extends BaseService<User> {
   private readonly logger = new Logger(UserService.name);
-  constructor(private readonly userRepository: UserRepository) {
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly rolesRepository: RolesRepository,
+  ) {
     super(userRepository);
   }
 
@@ -85,8 +90,14 @@ export class UserService extends BaseService<User> {
           email: email,
           isActive: true,
         },
-        relations: ['role', 'role.permissions'],
+        relations: [
+          'role',
+          'role.permissions',
+          'role.permissions.role',
+          'role.permissions.permission',
+        ],
       });
+
       if (!user) {
         return null;
       }
@@ -112,6 +123,25 @@ export class UserService extends BaseService<User> {
     } catch (error) {
       this.logger.error(error);
       return null;
+    }
+  }
+
+  async assignRoleToUser(id: string, roleId: string, user: User) {
+    try {
+      const role: Role = await this.rolesRepository.findOneBy({ id: roleId });
+      const userFetched = await this.userRepository.findOneBy({ id });
+
+      if (!role || !userFetched) {
+        throw new Error(`Role: ${roleId} or User: ${id} Does Not Exist`);
+      }
+
+      userFetched.role = role;
+      const savedUser = await this.userRepository.save(userFetched);
+      this.logger.debug(JSON.stringify(savedUser));
+      return new UserResponseDto(savedUser);
+    } catch (error) {
+      this.logger.error(`Error Assigning Role to User: ${error}`);
+      throw new InternalServerErrorException(`Error Assigning Role to User`);
     }
   }
 }

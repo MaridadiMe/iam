@@ -119,9 +119,10 @@ export class RolesService extends BaseService<Role> {
 
     try {
       const exists = await this.rolePermissionRepository.exists({
-        where: { role, permission },
+        where: { role: { id: role.id }, permission: { id: permission.id } },
       });
       if (exists) {
+        this.logger.debug('Mapping already exists');
         return this.findRoleById(roleId, true, user);
       }
     } catch (error) {
