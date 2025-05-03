@@ -39,7 +39,7 @@ export class RoleController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  // @Permissions('VIEW_ROLES')
+  @Permissions('VIEW_ROLES')
   async viewRole(
     @AuthenticatedUser() user: User,
     @Param('id') id: string,
@@ -51,7 +51,7 @@ export class RoleController {
 
   @Get()
   @HttpCode(200)
-  // @Permissions('VIEW_ROLES')
+  @Permissions('VIEW_ROLES')
   async getRoles(): Promise<BaseResponseDto<Role[]>> {
     const roles = await this.service.findAll();
     return new BaseResponseDto(roles);
@@ -59,7 +59,7 @@ export class RoleController {
 
   @Post(':id/permissions')
   @HttpCode(201)
-  // @Permissions('ASSIGN_PERMISSIONS')
+  @Permissions('ASSIGN_PERMISSION_TO_ROLE')
   async addPermissionToRole(
     @Param('id') id: string,
     @Body() payload: AddPermissionToRoleDto,

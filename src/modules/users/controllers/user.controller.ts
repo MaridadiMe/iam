@@ -17,7 +17,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserResponseDto } from '../dtos/user-response.dto';
 import { BaseResponseDto } from 'src/common/dto/base-response.dto';
 import { CreateUserDto } from '../dtos/create-user.dto';
-import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth-guard';
 import { Permissions } from 'src/modules/auth/decorators/permissions.decorator';
 import { PublicRoute } from 'src/modules/auth/decorators/public.decorator';
 import { AuthenticatedUser } from 'src/modules/auth/decorators/authenticated-user.decorator';
@@ -32,7 +31,7 @@ export class UserController extends BaseController<User> {
 
   @Get()
   @HttpCode(200)
-  // @Permissions('VIEW_USERS')
+  @Permissions('VIEW_USERS')
   async findAllUsers(): Promise<BaseResponseDto<UserResponseDto[]>> {
     const users = await this.userService.findAllUsers();
     return new BaseResponseDto(users);
@@ -40,7 +39,7 @@ export class UserController extends BaseController<User> {
 
   @Get(':id')
   @HttpCode(200)
-  // @Permissions('VIEW_USERS')
+  @Permissions('VIEW_USERS')
   async findUserById(
     @Param('id') id: string,
   ): Promise<BaseResponseDto<UserResponseDto>> {
@@ -50,7 +49,7 @@ export class UserController extends BaseController<User> {
 
   @Patch(':id/assign-role')
   @HttpCode(200)
-  // @Permissions('VIEW_USERS')
+  @Permissions('ASSIGN_ROLE')
   async assignRoleToUser(
     @Param('id') id: string,
     @Query('roleId') roleId: string,
