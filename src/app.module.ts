@@ -9,6 +9,7 @@ import { PermissionsGuard } from './modules/auth/guards/permissions.guard';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth-guard';
 import { RolesModule } from './modules/roles/roles.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
+import { RedisModule } from './core/redis/redis.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { PermissionsModule } from './modules/permissions/permissions.module';
       useFactory: (configSevice: ConfigService) =>
         databaseConnectionOptions(configSevice),
     }),
+    RedisModule,
     UserModule,
     AuthModule,
     RolesModule,

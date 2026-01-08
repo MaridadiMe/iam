@@ -20,6 +20,8 @@ import { CreateUserDto } from '../dtos/create-user.dto';
 import { Permissions } from 'src/modules/auth/decorators/permissions.decorator';
 import { PublicRoute } from 'src/modules/auth/decorators/public.decorator';
 import { AuthenticatedUser } from 'src/modules/auth/decorators/authenticated-user.decorator';
+import { VerifyOtpDto } from '../dtos/verify-otp.dto';
+import { RequestOtpDto } from '../dtos/request-otp.dto';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -67,5 +69,23 @@ export class UserController extends BaseController<User> {
   ): Promise<BaseResponseDto<UserResponseDto>> {
     const user = await this.userService.createUser(dto);
     return new BaseResponseDto(user, HttpStatus.CREATED);
+  }
+
+  @Post('confirm-phone')
+  @HttpCode(200)
+  @PublicRoute()
+  async verifyOtp(@Body() dto: VerifyOtpDto): Promise<BaseResponseDto<string>> {
+    const message = await this.userService.confirmPhoneVerification(dto);
+    return new BaseResponseDto(message, HttpStatus.CREATED);
+  }
+
+  @Post('verify-phone')
+  @HttpCode(200)
+  @PublicRoute()
+  async requestOtp(
+    @Body() dto: RequestOtpDto,
+  ): Promise<BaseResponseDto<string>> {
+    const message = await this.userService.requestOtp(dto);
+    return new BaseResponseDto(message, HttpStatus.CREATED);
   }
 }

@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  RequestMethod,
 } from '@nestjs/common';
 import { BaseService } from 'src/common/services/base.service';
 import { User } from '../entities/user.entity';
@@ -13,6 +14,13 @@ import { UserResponseDto } from '../dtos/user-response.dto';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { Role } from 'src/modules/roles/entities/role.entity';
 import { RolesRepository } from 'src/modules/roles/repositories/roles.repository';
+import { OtpService } from 'src/modules/otp/services/otp.service';
+import { OtpPurpose } from 'src/modules/otp/enums/otp-purpose.enum';
+import { formatPhoneNumber } from 'src/common/helpers/app-helpers';
+import { RestclientService } from 'src/modules/restclient/restclient.service';
+import { ConfigService } from '@nestjs/config';
+import { RequestOtpDto } from '../dtos/request-otp.dto';
+import { VerifyOtpDto } from '../dtos/verify-otp.dto';
 
 @Injectable()
 export class UserService extends BaseService<User> {
@@ -20,6 +28,9 @@ export class UserService extends BaseService<User> {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly rolesRepository: RolesRepository,
+    private readonly otpService: OtpService,
+    private readonly restClient: RestclientService,
+    private readonly configService: ConfigService,
   ) {
     super(userRepository);
   }
@@ -71,16 +82,67 @@ export class UserService extends BaseService<User> {
 
       const user = this.userRepository.create({
         ...dto,
+        phone: formatPhoneNumber(dto.phone),
         password: hash,
         createdBy: 'SYSTEM',
         userName,
       });
       const savedUser = await this.userRepository.save(user);
+      const otpDto: RequestOtpDto = {
+        purpose: OtpPurpose.PHONE_VERIFICATION,
+        user: savedUser,
+        userId: savedUser.id,
+      };
+      await this.requestOtp(otpDto);
       return new UserResponseDto(savedUser);
     } catch (error) {
       this.logger.error(`Error While Saving A User: ${error}`);
       throw new InternalServerErrorException(`Error While Creating User`);
     }
+  }
+
+  async requestOtp(dto: RequestOtpDto) {
+    try {
+      const { purpose, userId, user } = dto;
+      const userr = user
+        ? user
+        : await this.userRepository.findOneBy({ id: userId });
+      const { otp } = await this.otpService.requestOtp(purpose, userr.id);
+      const sendSmsPayload = {
+        message: `Hi, This is your onetime passsword OTP:: ${otp}. Contact us if you did not request the token`,
+        recipients: [userr.phone],
+      };
+      const token = `Bearer ${this.configService.get('IAM_ACCESS_TOKEN')}`;
+      const nseUrl = this.configService.get('NSE_BASE_URL');
+      const nseSmsEndpoint = this.configService.get('NSE_SMS_ENDPOINT');
+      await this.restClient.request({
+        url: `${nseUrl}${nseSmsEndpoint}`,
+        method: RequestMethod.POST,
+        payload: sendSmsPayload,
+        headers: { Authorization: token },
+      });
+    } catch (error) {
+      this.logger.error('Error While Requesting OTP', error.message);
+      return null;
+    }
+  }
+
+  async confirmPhoneVerification(dto: VerifyOtpDto): Promise<string> {
+    const { purpose, userId, otp } = dto;
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (user.isPhoneVerified) {
+      throw new BadRequestException('Phone already verified');
+    }
+
+    await this.otpService.verifyOtp(purpose, user.id, otp);
+
+    user.isPhoneVerified = true;
+    await this.userRepository.save(user);
+
+    return 'Phone verified successfully';
   }
 
   async validateUser(email: string, pass: string): Promise<UserResponseDto> {

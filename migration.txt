@@ -1,0 +1,20 @@
+# CREATE ADMIN ROLE #
+INSERT INTO ROLES (`id`,`name`, `createdBy`, `updatedBy`) VALUES ('ab2694bf-7d43-4952-95a4-e7f14379444c', 'ADMIN', 'SYSTEM', 'SYSTEM');
+
+# NECESSARY PERMISSIONS #
+INSERT INTO permissions (`id`, `createdBy`, `updatedBy`, `name`) VALUES ('52f25c62-898d-40ff-bdb3-69070e440f51', 'SYSTEM', 'SYSTEM', 'VIEW_ROLES');
+INSERT INTO permissions (`id`, `createdBy`, `updatedBy`, `name`) VALUES ('7a3ea6f8-e8c7-482c-a074-ed29b2474380', 'SYSTEM', 'SYSTEM', 'ASSIGN_PERMISSION_TO_ROLE');
+INSERT INTO permissions (`id`, `createdBy`, `updatedBy`, `name`) VALUES ('3af20740-b388-4f8f-a782-4266bfcaa509', 'SYSTEM', 'SYSTEM', 'VIEW_USERS');
+INSERT INTO permissions (`id`, `createdBy`, `updatedBy`, `name`) VALUES ('8fecc4a4-64e4-4881-afeb-8db1d2ad2b6f', 'SYSTEM', 'SYSTEM', 'ASSIGN_ROLE');
+INSERT INTO permissions (`id`, `createdBy`, `updatedBy`, `name`) VALUES ('f01e5ac6-b019-4b2d-8f8f-29ad14907b84', 'SYSTEM', 'SYSTEM', 'CREATE_PERMISSIONS');
+INSERT INTO permissions (`id`, `createdBy`, `updatedBy`, `name`) VALUES ('ccb3d1aa-522b-4087-b2d4-5f9ecd9c81d4', 'SYSTEM', 'SYSTEM', 'VIEW_PERMISSIONS');
+
+# MAP PERMISSIONS TO ADMIN #
+
+INSERT INTO role_permissions (`id`,`roleId`,`permissionId`) VALUES ('c76f1838-2a75-4c70-bb69-401cc75ef5d9','ab2694bf-7d43-4952-95a4-e7f14379444c','2b6f3034-51c8-48a0-8d32-3794917e3516');
+INSERT INTO role_permissions (`id`,`roleId`,`permissionId`) VALUES ('73e23e0f-4608-4164-b7d5-d133b49136da','ab2694bf-7d43-4952-95a4-e7f14379444c','3af20740-b388-4f8f-a782-4266bfcaa509');
+INSERT INTO role_permissions (`id`,`roleId`,`permissionId`) VALUES ('adc0e80c-014a-4435-baa6-a8b1cd9c75df','ab2694bf-7d43-4952-95a4-e7f14379444c','52f25c62-898d-40ff-bdb3-69070e440f51');
+INSERT INTO role_permissions (`id`,`roleId`,`permissionId`) VALUES ('a26c32cb-d81e-4554-9c84-d7528c3503bf','ab2694bf-7d43-4952-95a4-e7f14379444c','7a3ea6f8-e8c7-482c-a074-ed29b2474380');
+INSERT INTO role_permissions (`id`,`roleId`,`permissionId`) VALUES ('53ca7da6-81d3-4941-b073-249ab67c586b','ab2694bf-7d43-4952-95a4-e7f14379444c','8fecc4a4-64e4-4881-afeb-8db1d2ad2b6f');
+INSERT INTO role_permissions (`id`,`roleId`,`permissionId`) VALUES ('fe70ec2b-7d02-4a2b-b5dc-125826525d6d','ab2694bf-7d43-4952-95a4-e7f14379444c','ccb3d1aa-522b-4087-b2d4-5f9ecd9c81d4');
+INSERT INTO role_permissions (`id`,`roleId`,`permissionId`) VALUES ('58ae5abb-dfab-4fa3-969e-aa491c69c095','ab2694bf-7d43-4952-95a4-e7f14379444c','f01e5ac6-b019-4b2d-8f8f-29ad14907b84');

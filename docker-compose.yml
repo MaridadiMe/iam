@@ -1,0 +1,23 @@
+services:
+  rosemlabs-iam:
+    image: cross7heroad/rosemlabs:iam-1.0.0
+    container_name: rosemlabs-iam
+    restart: unless-stopped
+    env_file: .env
+    networks:       
+      - rosemlabs_proxy      
+
+    labels:
+      - "traefik.enable=true"
+
+      # HTTPS router
+      - "traefik.http.routers.rosemlabs-iams.entrypoints=websecure"
+      - "traefik.http.routers.rosemlabs-iams.rule=Host(`api.mydomain.com`) && PathPrefix(`/api/v1/iam`)"
+      - "traefik.http.routers.rosemlabs-iams.tls=true"
+      - "traefik.http.routers.rosemlabs-iams.tls.certresolver=le" 
+
+
+networks:
+  rosemlabs_proxy:           
+    external: true
+    name: rosemlabs_proxy
