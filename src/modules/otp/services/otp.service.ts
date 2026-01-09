@@ -86,6 +86,6 @@ export class OtpService {
       throw new UnauthorizedException('Invalid OTP');
     }
 
-    await this.otpRepo.delete(purpose, identifier);
+    await this.otpRepo.delete(purpose, this.createIdentifierHash(identifier));
   }
 }
