@@ -90,7 +90,6 @@ export class UserService extends BaseService<User> {
       const savedUser = await this.userRepository.save(user);
       const otpDto: RequestOtpDto = {
         purpose: OtpPurpose.PHONE_VERIFICATION,
-        user: savedUser,
         userId: savedUser.id,
       };
       await this.requestOtp(otpDto);
@@ -103,14 +102,14 @@ export class UserService extends BaseService<User> {
 
   async requestOtp(dto: RequestOtpDto) {
     try {
-      const { purpose, userId, user } = dto;
-      const userr = user
-        ? user
-        : await this.userRepository.findOneBy({ id: userId });
-      const { otp } = await this.otpService.requestOtp(purpose, userr.id);
+      const user = await this.userRepository.findOneBy({ id: dto.userId });
+      const { otp } = await this.otpService.requestOtp(
+        dto.purpose,
+        String(user.id),
+      );
       const sendSmsPayload = {
-        message: `Hi, This is your onetime passsword OTP:: ${otp}. Contact us if you did not request the token`,
-        recipients: [userr.phone],
+        message: `Your OTP for RosemLabs is ${otp} for mobile ${user.phone}. Contact Us if you did not request the token.`,
+        recipients: [user.phone],
       };
       const token = `Bearer ${this.configService.get('IAM_ACCESS_TOKEN')}`;
       const nseUrl = this.configService.get('NSE_BASE_URL');
@@ -137,7 +136,7 @@ export class UserService extends BaseService<User> {
       throw new BadRequestException('Phone already verified');
     }
 
-    await this.otpService.verifyOtp(purpose, user.id, otp);
+    await this.otpService.verifyOtp(purpose, String(user.id), otp);
 
     user.isPhoneVerified = true;
     await this.userRepository.save(user);

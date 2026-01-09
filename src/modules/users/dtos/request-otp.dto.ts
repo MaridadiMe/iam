@@ -13,9 +13,4 @@ export class RequestOtpDto {
   @IsNotEmpty()
   @IsString()
   userId: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsObject()
-  user: User = null;
 }
