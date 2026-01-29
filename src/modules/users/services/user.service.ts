@@ -81,14 +81,18 @@ export class UserService extends BaseService<User> {
     try {
       const salt = await bcrypt.genSalt();
       const hash = await bcrypt.hash(dto.password, salt);
-      const userName = `${dto.firstName[0]}${dto.lastName}`.toUpperCase();
+      // const userName = `${dto.firstName[0]}${dto.lastName}`.toUpperCase();
+
+      const baseUsername = `${dto.firstName[0]}${dto.lastName}`.toUpperCase();
+      const suffix = Math.floor(1000 + Math.random() * 9000);
+      const username = `${baseUsername}${suffix}`;
 
       const user = this.userRepository.create({
         ...dto,
         phone: normalizedPhone,
         password: hash,
         createdBy: 'SYSTEM',
-        userName,
+        userName: username,
       });
       const savedUser = await this.userRepository.save(user);
       const otpDto: RequestOtpDto = {
