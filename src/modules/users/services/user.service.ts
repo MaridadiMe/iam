@@ -62,9 +62,10 @@ export class UserService extends BaseService<User> {
 
   async createUser(dto: CreateUserDto): Promise<UserResponseDto> {
     let userExists: boolean = false;
+    const normalizedPhone = formatPhoneNumber(dto.phone);
     try {
       userExists = await this.userRepository.exists({
-        where: [{ email: dto.email }, { phone: formatPhoneNumber(dto.phone) }],
+        where: [{ email: dto.email }, { phone: normalizedPhone }],
       });
     } catch (error) {
       this.logger.error(`Error Checking If User Exists: ${error}`);
@@ -84,7 +85,7 @@ export class UserService extends BaseService<User> {
 
       const user = this.userRepository.create({
         ...dto,
-        phone: formatPhoneNumber(dto.phone),
+        phone: normalizedPhone,
         password: hash,
         createdBy: 'SYSTEM',
         userName,
