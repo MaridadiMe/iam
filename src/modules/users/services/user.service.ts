@@ -64,7 +64,7 @@ export class UserService extends BaseService<User> {
     let userExists: boolean = false;
     try {
       userExists = await this.userRepository.exists({
-        where: { email: dto.email },
+        where: [{ email: dto.email }, { phone: formatPhoneNumber(dto.phone) }],
       });
     } catch (error) {
       this.logger.error(`Error Checking If User Exists: ${error}`);
@@ -72,7 +72,9 @@ export class UserService extends BaseService<User> {
     }
 
     if (userExists) {
-      throw new BadRequestException(`User With This Email Already Exists`);
+      throw new BadRequestException(
+        `User With This Email/Phone Already Exists`,
+      );
     }
 
     try {
