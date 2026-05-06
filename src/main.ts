@@ -13,6 +13,10 @@ dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix(process.env.API_BASE_URL ?? 'api/v1/app');
+  app.enableCors({
+    origin: ['https://yatown.rosemlabs.com'],
+    credentials: true,
+  });
   const APP_PORT = process.env.APP_PORT;
 
   app.useGlobalPipes(
