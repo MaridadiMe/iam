@@ -8,6 +8,7 @@ export class UserResponseDto {
   lastName: string;
   userName: string;
   permissions: string[];
+  role: string;
 
   constructor(user: User) {
     this.id = user.id;
@@ -17,5 +18,6 @@ export class UserResponseDto {
     this.email = user.email;
     this.userName = user.userName;
     this.permissions = user.permissions;
+    this.role = user.role.name;
   }
 }
