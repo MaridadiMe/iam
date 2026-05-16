@@ -104,7 +104,7 @@ export class UserService extends BaseService<User> {
         purpose: OtpPurpose.PHONE_VERIFICATION,
         userId: savedUser.id,
       };
-      await this.requestOtp(otpDto);
+      //await this.requestOtp(otpDto);
       return new UserResponseDto(savedUser);
     } catch (error) {
       this.logger.error(`Error While Saving A User: ${error}`);
