@@ -87,12 +87,17 @@ export class UserService extends BaseService<User> {
       const suffix = Math.floor(1000 + Math.random() * 9000);
       const username = `${baseUsername}${suffix}`;
 
+      const defaultRole = await this.rolesRepository.findOneBy({
+        isDefault: true,
+      });
+
       const user = this.userRepository.create({
         ...dto,
         phone: normalizedPhone,
         password: hash,
         createdBy: 'SYSTEM',
         userName: username,
+        role: defaultRole,
       });
       const savedUser = await this.userRepository.save(user);
       const otpDto: RequestOtpDto = {

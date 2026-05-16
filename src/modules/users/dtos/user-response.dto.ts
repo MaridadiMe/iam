@@ -17,7 +17,7 @@ export class UserResponseDto {
     this.phone = user.phone;
     this.email = user.email;
     this.userName = user.userName;
-    this.permissions = user.permissions;
-    this.role = user.role.name;
+    this.permissions = user?.permissions;
+    this.role = user?.role?.name;
   }
 }
