@@ -5,7 +5,9 @@ import {
   Logger,
   NotFoundException,
   RequestMethod,
+  UnauthorizedException,
 } from '@nestjs/common';
+import { TokenPayload } from 'google-auth-library';
 import { BaseService } from 'src/common/services/base.service';
 import { User } from '../entities/user.entity';
 import * as bcrypt from 'bcrypt';
@@ -197,6 +199,68 @@ export class UserService extends BaseService<User> {
       this.logger.error(error);
       return null;
     }
+  }
+
+  async findOrCreateGoogleUser(payload: TokenPayload): Promise<UserResponseDto> {
+    const relations = [
+      'role',
+      'role.permissions',
+      'role.permissions.role',
+      'role.permissions.permission',
+    ];
+
+    let user = await this.userRepository.findOne({
+      where: { googleId: payload.sub },
+      relations,
+    });
+
+    if (!user) {
+      user = await this.userRepository.findOne({
+        where: { email: payload.email },
+        relations,
+      });
+      if (user) {
+        user.googleId = payload.sub;
+        user = await this.userRepository.save(user);
+      }
+    }
+
+    if (!user) {
+      const defaultRole = await this.rolesRepository.findOneBy({
+        isDefault: true,
+      });
+      const baseUsername =
+        `${payload.given_name[0]}${payload.family_name}`.toUpperCase();
+      const suffix = Math.floor(1000 + Math.random() * 9000);
+      const userName = `${baseUsername}${suffix}`;
+
+      const newUser = this.userRepository.create({
+        firstName: payload.given_name,
+        lastName: payload.family_name,
+        email: payload.email,
+        googleId: payload.sub,
+        isEmailVerified: payload.email_verified ?? false,
+        userName,
+        role: defaultRole,
+        createdBy: 'GOOGLE',
+      });
+      const saved = await this.userRepository.save(newUser);
+      user = await this.userRepository.findOne({
+        where: { id: saved.id },
+        relations,
+      });
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException('Account is inactive');
+    }
+
+    if (user.role) {
+      user.permissions =
+        user.role.permissions?.flatMap((p) => p.permission.name) ?? [];
+    }
+
+    return new UserResponseDto(user);
   }
 
   async assignRoleToUser(id: string, roleId: string, user: User) {

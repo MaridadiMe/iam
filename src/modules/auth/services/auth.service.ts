@@ -2,15 +2,18 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserResponseDto } from 'src/modules/users/dtos/user-response.dto';
 import { RequestPasswordChangeDto } from '../dtos/request-password-change.dto';
+import { GoogleLoginDto } from '../dtos/google-login.dto';
 import { UserService } from 'src/modules/users/services/user.service';
 import { User } from 'src/modules/users/entities/user.entity';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ConfigService } from '@nestjs/config';
+import { OAuth2Client, TokenPayload } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
@@ -62,6 +65,29 @@ export class AuthService {
     this.logger.log(`Password change requested for user with ID: ${user.id}`);
 
     return resp;
+  }
+
+  async googleLogin(dto: GoogleLoginDto): Promise<{ accessToken: string }> {
+    const clientId = this.configService.get<string>('GOOGLE_CLIENT_ID');
+    const client = new OAuth2Client(clientId);
+
+    let googlePayload: TokenPayload;
+    try {
+      const ticket = await client.verifyIdToken({
+        idToken: dto.idToken,
+        audience: clientId,
+      });
+      googlePayload = ticket.getPayload();
+    } catch {
+      throw new UnauthorizedException('Invalid Google ID token');
+    }
+
+    if (!googlePayload) {
+      throw new UnauthorizedException('Invalid Google ID token');
+    }
+
+    const user = await this.userService.findOrCreateGoogleUser(googlePayload);
+    return this.signIn(user);
   }
 
   getPublicKey() {

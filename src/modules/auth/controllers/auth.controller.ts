@@ -13,6 +13,7 @@ import { LocalAuthGuard } from '../guards/local-auth-guard';
 import { ApiBody } from '@nestjs/swagger';
 import { BaseResponseDto } from 'src/common/dto/base-response.dto';
 import { RequestPasswordChangeDto } from '../dtos/request-password-change.dto';
+import { GoogleLoginDto } from '../dtos/google-login.dto';
 import { Response } from 'express';
 import { PublicRoute } from '../decorators/public.decorator';
 
@@ -38,6 +39,16 @@ export class AuthController {
     @Request() req,
   ): Promise<BaseResponseDto<{ accessToken: string }>> {
     const data = this.authService.signIn(req.user);
+    return new BaseResponseDto(data);
+  }
+
+  @Post('googleLogin')
+  @HttpCode(200)
+  @PublicRoute()
+  async googleLogin(
+    @Body() dto: GoogleLoginDto,
+  ): Promise<BaseResponseDto<{ accessToken: string }>> {
+    const data = await this.authService.googleLogin(dto);
     return new BaseResponseDto(data);
   }
 

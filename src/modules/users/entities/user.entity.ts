@@ -16,7 +16,7 @@ export class User extends BaseEntity {
   @Column()
   lastName: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: true })
   phone: string;
 
   @Column({ unique: true })
@@ -24,6 +24,9 @@ export class User extends BaseEntity {
 
   @Column({ unique: true })
   email: string;
+
+  @Column({ nullable: true })
+  googleId: string;
 
   @Column({ default: false })
   isAdmin: boolean;
@@ -34,7 +37,7 @@ export class User extends BaseEntity {
   @Column({ default: false })
   isEmailVerified: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   password: string;
 
   @Column({ default: true })
