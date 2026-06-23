@@ -4,12 +4,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { databaseConnectionOptions } from './core/config/database.config';
 import { UserModule } from './modules/users/user.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { APP_GUARD, Reflector } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { PermissionsGuard } from './modules/auth/guards/permissions.guard';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth-guard';
 import { RolesModule } from './modules/roles/roles.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { RedisModule } from './core/redis/redis.module';
+import { AppHttpInterceptor } from './common/filters/app-http.interceptor';
 
 @Module({
   imports: [
@@ -29,7 +30,10 @@ import { RedisModule } from './core/redis/redis.module';
     PermissionsModule,
   ],
   providers: [
-    // Reflector,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AppHttpInterceptor,
+    },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
